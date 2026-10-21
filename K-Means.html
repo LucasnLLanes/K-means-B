@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Informe K-Means — Lucas Nahuel Llanes (2026)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --purpura:  #5e35b1;
+      --coral:    #ff6f61;
+      --turquesa: #26c6da;
+      --amarillo: #f4b400;
+      --lavanda:  #f3e5f5;
+      --grafito:  #2d2d3a;
+      --gris:     #e0e0e8;
+      --blanco:   #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      margin: 0;
+      background: var(--grafito);
+      color: var(--grafito);
+      line-height: 1.65;
+    }
+    .topbar {
+      background: var(--purpura);
+      padding: 16px 40px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: var(--blanco);
+    }
+    .topbar img { height: 46px; }
+    .topbar span {
+      font-size: 0.95em;
+      letter-spacing: 1.5px;
+      font-weight: 500;
+    }
+    .hero {
+      background: linear-gradient(135deg, var(--purpura), var(--turquesa));
+      padding: 80px 40px;
+      text-align: center;
+      color: var(--blanco);
+    }
+    .hero h1 {
+      font-size: 2.3em;
+      margin: 0 0 18px;
+      font-weight: 700;
+    }
+    .hero .meta p {
+      margin: 6px 0;
+      font-size: 1em;
+      opacity: 0.95;
+    }
+    .hero .meta strong { color: #ffe082; }
+    .card {
+      max-width: 880px;
+      margin: -40px auto 60px;
+      background: var(--lavanda);
+      padding: 45px 50px;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+    h2 {
+      color: var(--purpura);
+      font-size: 1.4em;
+      margin-top: 40px;
+      padding-bottom: 8px;
+      border-bottom: 3px solid var(--coral);
+    }
+    h3 {
+      color: var(--turquesa);
+      font-size: 1.05em;
+      margin-top: 25px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    p { font-size: 1em; }
+    ul { padding-left: 22px; }
+    code {
+      font-family: 'Fira Code', 'Consolas', monospace;
+      background: var(--blanco);
+      color: var(--purpura);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: var(--blanco);
+      color: var(--grafito);
+      padding: 18px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 0.85em;
+      line-height: 1.55;
+      border-left: 5px solid var(--turquesa);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    pre code { background: transparent; padding: 0; color: inherit; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      background: var(--blanco);
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 0.95em;
+    }
+    th {
+      background: var(--purpura);
+      color: var(--blanco);
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+    td { padding: 10px 12px; border-bottom: 1px solid var(--gris); }
+    tr:nth-child(even) td { background: #faf5fc; }
+    .highlight {
+      background: var(--blanco);
+      border-left: 5px solid var(--coral);
+      padding: 18px 22px;
+      border-radius: 8px;
+      margin: 25px 0;
+      font-size: 0.96em;
+      color: var(--grafito);
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: 600;
+      color: var(--blanco);
+    }
+    .b-purpura { background: var(--purpura); }
+    .b-coral   { background: var(--coral); }
+    .b-turq    { background: var(--turquesa); }
+    .b-amar    { background: var(--amarillo); color: var(--grafito); }
+    img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin: 15px 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .footer {
+      text-align: center;
+      padding: 30px 20px;
+      color: #bfbfcc;
+      font-size: 0.85em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <span>INSTITUTO SUPERIOR DE FORMACIÓN TÉCNICA N° 197</span>
+  </div>
+
+  <div class="hero">
+    <h1>Clustering de Estudiantes Universitarios<br>con K-Means</h1>
+    <div class="meta">
+      <p><strong>Autor:</strong> Lucas Nahuel Llanes</p>
+      <p><strong>Materia:</strong> Aprendizaje Automático</p>
+      <p><strong>Carrera:</strong> Tecnicatura en Ciencia de Datos e IA</p>
+      <p><strong>Año:</strong> 2026</p>
+    </div>
+  </div>
+
+  <div class="card">
+
+    <h2>1. Resumen</h2>
+    <p>Este documento acompaña al script <code>kmeans_estudiantes_llanes.py</code> y al notebook <code>K-Means-Estudiantes-Llanes.ipynb</code>. Se aplicó el algoritmo <strong>K-Means</strong> para segmentar 50 estudiantes universitarios según edad, horas de estudio semanales y promedio académico. El número de clusters se fijó en <code>K = 4</code>, coincidiendo con el codo del gráfico de inercia y con la consigna del trabajo.</p>
+
+    <h2>2. Marco conceptual</h2>
+    <p>K-Means es un método de aprendizaje no supervisado que particiona un conjunto de datos en K grupos minimizando la <em>inercia</em>: la suma de distancias al cuadrado entre cada observación y el centroide de su cluster. Cuanto menor es la inercia, más compactos son los grupos.</p>
+    <p>La paleta usada en todo el proyecto es:</p>
+    <table>
+      <tr><th>Rol</th><th>Color</th><th>Hex</th></tr>
+      <tr><td>Primario</td><td><span class="badge b-purpura">Púrpura</span></td><td><code>#5e35b1</code></td></tr>
+      <tr><td>Secundario</td><td><span class="badge b-coral">Coral</span></td><td><code>#ff6f61</code></td></tr>
+      <tr><td>Acento</td><td><span class="badge b-turq">Turquesa</span></td><td><code>#26c6da</code></td></tr>
+      <tr><td>Cuarto cluster</td><td><span class="badge b-amar">Amarillo</span></td><td><code>#f4b400</code></td></tr>
+    </table>
+
+    <h2>3. Pipeline (idéntico al script)</h2>
+
+    <h3>3.1 Dataset</h3>
+    <p>50 registros con los campos <code>edad</code> (int, 21–60), <code>horas_estudio</code> (int, 2–15) y <code>promedio_academico</code> (float, 1.0–9.11). Fuente: conjunto sintético provisto por la cátedra.</p>
+
+    <h3>3.2 Estandarización</h3>
+    <p>Se aplica <code>StandardScaler</code> para que las tres variables contribuyan equitativamente:</p>
+    <pre><code>X = df[["edad", "horas_estudio", "promedio_academico"]].values
+escalador = StandardScaler()
+X_esc = escalador.fit_transform(X)</code></pre>
+
+    <h3>3.3 Método del codo</h3>
+    <p>Se calcula la inercia para K entre 1 y 10 y se grafica con la paleta púrpura/coral:</p>
+    <pre><code>inercias = []
+valores_k = range(1, 11)
+
+for k in valores_k:
+    km = KMeans(n_clusters=k, random_state=42)
+    km.fit(X_esc)
+    inercias.append(km.inertia_)
+
+plt.plot(valores_k, inercias,
+         marker="D", color="#5e35b1",
+         linewidth=2.5, markersize=8,
+         markerfacecolor="#ff6f61",
+         markeredgecolor="#2d2d3a")</code></pre>
+
+    <img src="Figure_1.png" alt="Método del Codo">
+
+    <div class="highlight">
+      La curva se aplana a partir de <strong>K = 4</strong>, valor que además coincide con la consigna del trabajo práctico.
+    </div>
+
+    <h3>3.4 Modelo final</h3>
+    <pre><code>modelo = KMeans(n_clusters=4, random_state=42)
+df["cluster"] = modelo.fit_predict(X_esc)</code></pre>
+
+    <h3>3.5 Visualización</h3>
+    <p>Los cuatro clusters se pintan con la misma paleta del script:</p>
+    <pre><code>paleta = {0: "#5e35b1", 1: "#ff6f61", 2: "#26c6da", 3: "#f4b400"}
+
+plt.scatter(grupo["edad"], grupo["promedio_academico"],
+            color=paleta[c], s=90,
+            edgecolor="#2d2d3a", linewidth=0.6)</code></pre>
+
+    <img src="Figure_2.png" alt="Segmentación de Estudiantes">
+
+    <h2>4. Hallazgos</h2>
+
+    <table>
+      <tr><th>Cluster</th><th>Perfil</th><th>Interpretación</th></tr>
+      <tr>
+        <td><span class="badge b-purpura">0 · púrpura</span></td>
+        <td>Jóvenes, muchas horas de estudio, promedios bajos</td>
+        <td>Principiantes esforzados</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-coral">1 · coral</span></td>
+        <td>Mediana edad, horas moderadas, promedios medios</td>
+        <td>Perfil estable</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-turq">2 · turquesa</span></td>
+        <td>Mayores, pocas horas, promedios altos</td>
+        <td>Experimentados</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-amar">3 · amarillo</span></td>
+        <td>Jóvenes, pocas horas, promedios bajos</td>
+        <td>Desmotivados</td>
+      </tr>
+    </table>
+
+    <ul>
+      <li>La inercia final con <strong>K = 4</strong> es la reportada en la consola del script.</li>
+      <li>Los grupos muestran una separación clara entre edad y promedio académico.</li>
+      <li>La estandarización evitó que la edad dominara sobre las otras variables.</li>
+    </ul>
+
+    <h2>5. Cierre y trabajo futuro</h2>
+    <p>El pipeline permitió identificar cuatro perfiles estudiantiles con implicancias pedagógicas directas (tutorías, grupos de apoyo, mentorías). Como líneas futuras se propone:</p>
+    <ul>
+      <li>Incorporar <strong>horas de trabajo</strong> y <strong>situación laboral</strong>.</li>
+      <li>Sumar <strong>índice socioeconómico</strong> como variable de contexto.</li>
+      <li>Validar los clusters con <strong>índice de silhouette</strong>.</li>
+    </ul>
+
+    <h2>6. Referencias al código</h2>
+    <table>
+      <tr><th>Archivo</th><th>Contenido</th></tr>
+      <tr><td><code>kmeans_estudiantes_llanes.py</code></td><td>Script ejecutable desde consola</td></tr>
+      <tr><td><code>K-Means-Estudiantes-Llanes.ipynb</code></td><td>Notebook con celdas explicativas</td></tr>
+      <tr><td><code>codo_estudiantes.png</code></td><td>Método del codo</td></tr>
+      <tr><td><code>grafico_estudiantes.png</code></td><td>Scatter de clusters</td></tr>
+    </table>
+
+  </div>
+
+  <div class="footer">
+    Lucas Nahuel Llanes · ISFT N° 197 · 2026
+  </div>
+
+</body>
+</html>
